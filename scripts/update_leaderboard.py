@@ -1,42 +1,86 @@
 
-name: Update LeetCode Leaderboard
+from pathlib import Path
+import re
 
-on:
-  push:
-    branches:
-      - main
-  workflow_dispatch:
+ROOT = Path(__file__).resolve().parents[1]
+README = ROOT / "README.md"
 
-permissions:
-  contents: write
+PLAYERS = {
+    "rashi": "Rashi",
+    "noah": "Noah",
+}
 
-jobs:
-  update-leaderboard:
-    runs-on: ubuntu-latest
+EXTENSIONS = {
+    ".py", ".cpp", ".cc", ".c", ".java",
+    ".js", ".ts", ".go", ".rs", ".cs", ".kt"
+}
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+START = "<!-- LEADERBOARD_START -->"
+END = "<!-- LEADERBOARD_END -->"
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
 
-      - name: Generate leaderboard
-        run: python scripts/update_leaderboard.py
+def count_solutions(folder):
+    path = ROOT / folder
+    if not path.is_dir():
+        return 0
 
-      - name: Commit README changes
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+    return sum(
+        1 for file in path.rglob("*")
+        if file.is_file()
+        and file.suffix.lower() in EXTENSIONS
+    )
 
-          git add README.md
 
-          if git diff --cached --quiet; then
-            echo "No leaderboard changes"
-            exit 0
-          fi
+def generate_leaderboard():
+    scores = [
+        (name, count_solutions(folder))
+        for folder, name in PLAYERS.items()
+    ]
 
-          git commit -m "docs: update LeetCode leaderboard"
-          git push
+    scores.sort(key=lambda x: (-x[1], x[0]))
+
+    lines = [
+        "## 🏆 LeetCode Leaderboard",
+        "",
+        "| Rank | Player | Questions Solved |",
+        "|:---:|:---|---:|",
+    ]
+
+    medals = ["🥇", "🥈"]
+
+    for index, (name, count) in enumerate(scores):
+        medal = medals[index] if index < 2 else f"#{index + 1}"
+        lines.append(f"| {medal} | {name} | {count} |")
+
+    lines.extend([
+        "",
+        f"**Total solutions:** {sum(score for _, score in scores)}",
+        "",
+        "_Automatically updated by GitHub Actions._",
+    ])
+
+    return "\n".join(lines)
+
+
+def main():
+    content = README.read_text(encoding="utf-8")
+    leaderboard = generate_leaderboard()
+
+    replacement = f"{START}\n{leaderboard}\n{END}"
+
+    if START in content and END in content:
+        pattern = re.escape(START) + r".*?" + re.escape(END)
+        content = re.sub(
+            pattern,
+            lambda match: replacement,
+            content,
+            flags=re.DOTALL,
+        )
+    else:
+        content = content.rstrip() + "\n\n" + replacement + "\n"
+
+    README.write_text(content, encoding="utf-8")
+
+
+if __name__ == "__main__":
+    main()
