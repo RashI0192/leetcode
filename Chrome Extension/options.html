@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>LeetCode to GitHub – Settings</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        font-family: system-ui, sans-serif;
+      }
+      body {
+        max-width: 32rem;
+        margin: 2rem auto;
+        padding: 0 1rem;
+      }
+      label {
+        display: block;
+        margin-top: 1rem;
+        font-weight: 600;
+      }
+      input {
+        box-sizing: border-box;
+        width: 100%;
+        margin-top: 0.25rem;
+        padding: 0.5rem;
+        font: inherit;
+      }
+      small {
+        color: GrayText;
+        font-weight: normal;
+      }
+      .buttons {
+        display: flex;
+        gap: 0.5rem;
+        margin-top: 1.5rem;
+      }
+      button {
+        padding: 0.5rem 1rem;
+        font: inherit;
+        cursor: pointer;
+      }
+      #status {
+        min-height: 1.5em;
+        margin-top: 1rem;
+      }
+      #status.ok {
+        color: #2da44e;
+      }
+      #status.error {
+        color: #cf222e;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>LeetCode to GitHub</h1>
+    <p>Accepted LeetCode submissions are committed to this repository automatically.</p>
+
+    <form id="settings">
+      <label>
+        GitHub token
+        <small>— fine-grained PAT, this repo only, Contents: Read and write</small>
+        <input name="token" type="password" autocomplete="off" required />
+      </label>
+      <label>
+        Owner
+        <small>— your GitHub username or org</small>
+        <input name="owner" required />
+      </label>
+      <label>
+        Repository
+        <input name="repo" required />
+      </label>
+      <label>
+        Branch
+        <input name="branch" placeholder="main" />
+      </label>
+
+      <div class="buttons">
+        <button type="submit">Save</button>
+        <button type="button" id="test">Test connection</button>
+      </div>
+    </form>
+
+    <p id="status" role="status"></p>
+
+    <script type="module" src="options.js"></script>
+  </body>
+</html>
