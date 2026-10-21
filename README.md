@@ -6,9 +6,9 @@
 | Rank | Player | Questions Solved |
 |:---:|:---|---:|
 | 🥇 | Rashi | 12 |
-| 🥈 | Noah | 1 |
+| 🥈 | Noah | 2 |
 
-**Total solutions:** 13
+**Total solutions:** 14
 
 _Automatically updated by GitHub Actions._
 <!-- LEADERBOARD_END -->
